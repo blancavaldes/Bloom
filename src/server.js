@@ -18,7 +18,16 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+    },
+  },
+}));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,12 +66,16 @@ app.get('/mindfulness', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mindfulness.html'));
 });
 
+app.get('/account', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'account.html'));
+});
+
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.redirect('/account');
 });
 
 app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+  res.redirect('/account');
 });
 
 const port = process.env.PORT || 3000;

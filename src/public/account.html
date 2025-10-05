@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account — Bloom</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <style>
+    .user-info {
+      text-align: center;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 20px;
+    }
+    .user-info h3 {
+      margin: 0 0 10px 0;
+      color: var(--text);
+    }
+    .user-info p {
+      margin: 0;
+      color: var(--muted);
+    }
+    .register-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/">Bloom</a>
+      <nav>
+        <a class="btn btn-outline" href="/exercise">Exercise</a>
+        <a class="btn btn-outline" href="/food">Food</a>
+        <a class="btn btn-outline" href="/mindfulness">Mindfulness</a>
+        <a href="/account" class="btn user-btn" title="Account">Account</a>
+      </nav>
+    </div>
+  </header>
+  
+  <main class="container narrow">
+    <h1>Account</h1>
+    
+    <!-- User Info (shown when logged in) -->
+    <div id="userInfo" class="user-info" style="display: none;">
+      <h3>Welcome back!</h3>
+      <p>You are currently logged in.</p>
+      <button id="logoutBtn" class="btn btn-outline" style="margin-top: 12px;">Logout</button>
+    </div>
+    
+    <!-- Account Forms (shown when not logged in) -->
+    <div id="accountForms" style="display: block;">
+      <!-- Login Form (default) -->
+      <form id="loginForm" class="card" method="post" action="/api/login">
+        <h2>Login</h2>
+        <label>Email<input type="email" name="email" required /></label>
+        <label>Password<input type="password" name="password" required /></label>
+        <button class="btn" type="submit">Login</button>
+        <div id="loginMsg" class="msg"></div>
+      </form>
+      
+      <!-- Register Option -->
+      <div class="register-section" style="text-align: center; margin-top: 20px;">
+        <p class="muted">Don't have an account?</p>
+        <button id="showRegisterBtn" class="btn btn-outline">Create Account</button>
+      </div>
+      
+      <!-- Register Form (hidden by default) -->
+      <form id="registerForm" class="card" method="post" action="/api/register" style="display: none;">
+        <h2>Create Account</h2>
+        <label>Email<input type="email" name="email" required /></label>
+        <label>Password<input type="password" name="password" required minlength="6" /></label>
+        <button class="btn" type="submit">Register</button>
+        <div id="registerMsg" class="msg"></div>
+        <div style="text-align: center; margin-top: 15px;">
+          <button id="showLoginBtn" class="btn btn-outline" type="button">Back to Login</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Check if user is logged in
+    async function checkAuthStatus() {
+      try {
+        console.log('Checking auth status...');
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        console.log('Auth status:', data);
+        
+        if (data.loggedIn) {
+          console.log('User is logged in, showing user info');
+          document.getElementById('userInfo').style.display = 'block';
+          document.getElementById('accountForms').style.display = 'none';
+        } else {
+          console.log('User is not logged in, showing account forms');
+          document.getElementById('userInfo').style.display = 'none';
+          document.getElementById('accountForms').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        // Default to showing forms if there's an error
+        document.getElementById('userInfo').style.display = 'none';
+        document.getElementById('accountForms').style.display = 'block';
+      }
+    }
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show/hide register form functionality
+      const showRegisterBtn = document.getElementById('showRegisterBtn');
+      console.log('showRegisterBtn element:', showRegisterBtn);
+      if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('Create Account button clicked!');
+          document.getElementById('loginForm').style.display = 'none';
+          document.querySelector('.register-section').style.display = 'none';
+          document.getElementById('registerForm').style.display = 'block';
+          
+          // Clear messages
+          document.getElementById('loginMsg').textContent = '';
+          document.getElementById('registerMsg').textContent = '';
+        });
+        console.log('Event listener added to Create Account button');
+      } else {
+        console.error('Create Account button not found!');
+      }
+
+      const showLoginBtn = document.getElementById('showLoginBtn');
+      if (showLoginBtn) {
+        showLoginBtn.addEventListener('click', () => {
+          document.getElementById('registerForm').style.display = 'none';
+          document.getElementById('loginForm').style.display = 'block';
+          document.querySelector('.register-section').style.display = 'block';
+          
+          // Clear messages
+          document.getElementById('loginMsg').textContent = '';
+          document.getElementById('registerMsg').textContent = '';
+        });
+      }
+
+      // Login form submission
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const data = Object.fromEntries(new FormData(form));
+          
+          try {
+            const res = await fetch('/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+            
+            const json = await res.json();
+            
+            if (json.success) {
+              location.href = '/';
+            } else {
+              document.getElementById('loginMsg').textContent = json.error || 'Login failed';
+            }
+          } catch (error) {
+            document.getElementById('loginMsg').textContent = 'Login failed. Please try again.';
+          }
+        });
+      }
+
+      // Register form submission
+      const registerForm = document.getElementById('registerForm');
+      if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const data = Object.fromEntries(new FormData(form));
+          
+          try {
+            const res = await fetch('/api/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+            
+            const json = await res.json();
+            
+            if (json.success) {
+              location.href = '/';
+            } else {
+              document.getElementById('registerMsg').textContent = json.error || 'Registration failed';
+            }
+          } catch (error) {
+            document.getElementById('registerMsg').textContent = 'Registration failed. Please try again.';
+          }
+        });
+      }
+
+      // Logout functionality
+      const logoutBtn = document.getElementById('logoutBtn');
+      console.log('logoutBtn element:', logoutBtn);
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+          console.log('Logout button clicked!');
+          try {
+            const res = await fetch('/api/logout', { method: 'POST' });
+            const json = await res.json();
+            console.log('Logout response:', json);
+            
+            if (json.success) {
+              console.log('Logout successful, redirecting...');
+              location.href = '/';
+            } else {
+              console.error('Logout failed:', json);
+            }
+          } catch (error) {
+            console.error('Logout failed:', error);
+          }
+        });
+        console.log('Event listener added to logout button');
+      } else {
+        console.log('Logout button not found (user might not be logged in)');
+      }
+    });
+
+    // Check auth status on page load
+    checkAuthStatus();
+  </script>
+</body>
+</html>

@@ -35,6 +35,10 @@ router.post('/api/logout', (req, res) => {
   req.session.destroy(() => res.json({ success: true }));
 });
 
+router.get('/api/auth/status', (req, res) => {
+  res.json({ loggedIn: !!req.session.userId });
+});
+
 export default router;
 
 
