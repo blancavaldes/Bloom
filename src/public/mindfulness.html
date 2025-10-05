@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mindfulness — Bloom</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/">Bloom</a>
+      <nav>
+        <a class="btn btn-outline" href="/exercise">Exercise</a>
+        <a class="btn btn-outline" href="/food">Food</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <h1>Mindfulness Journal</h1>
+    <form id="journalForm" class="card grid">
+      <label>Date<input type="date" name="date" required /></label>
+      <label>Title<input type="text" name="title" placeholder="e.g., Morning Reflection" required /></label>
+      <label class="full">Entry<textarea name="content" rows="4" placeholder="Write your thoughts..."></textarea></label>
+      <button class="btn full" type="submit">Add Entry</button>
+    </form>
+    <ul id="journalList" class="list"></ul>
+  </main>
+  <script src="/static/js/mindfulness.js"></script>
+</body>
+</html>
+
+

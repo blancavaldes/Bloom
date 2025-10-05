@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise — Bloom</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/">Bloom</a>
+      <nav>
+        <a class="btn btn-outline" href="/food">Food</a>
+        <a class="btn btn-outline" href="/mindfulness">Mindfulness</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <h1>Workouts</h1>
+    <form id="workoutForm" class="card grid">
+      <label>Date<input type="date" name="date" required /></label>
+      <label>Type<input type="text" name="type" placeholder="e.g., Run, Yoga" required /></label>
+      <label>Duration (min)<input type="number" name="duration_minutes" min="0" step="1" /></label>
+      <label class="full">Notes<textarea name="notes" rows="2" placeholder="How did it feel?"></textarea></label>
+      <button class="btn full" type="submit">Add Workout</button>
+    </form>
+    <ul id="workoutList" class="list"></ul>
+  </main>
+  <script src="/static/js/exercise.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Bloom</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <main class="container narrow">
+    <h1>Welcome back</h1>
+    <form id="loginForm" class="card" method="post" action="/api/login">
+      <label>Email<input type="email" name="email" required /></label>
+      <label>Password<input type="password" name="password" required /></label>
+      <button class="btn" type="submit">Login</button>
+      <p class="muted">No account? <a href="/register">Register</a></p>
+      <div id="msg" class="msg"></div>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const json = await res.json();
+      if (json.success) location.href = '/'; else document.getElementById('msg').textContent = json.error || 'Login failed';
+    });
+  </script>
+  </body>
+  </html>
+

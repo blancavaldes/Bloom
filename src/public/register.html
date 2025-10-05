@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — Bloom</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <main class="container narrow">
+    <h1>Create your account</h1>
+    <form id="registerForm" class="card" method="post" action="/api/register">
+      <label>Email<input type="email" name="email" required /></label>
+      <label>Password<input type="password" name="password" required minlength="6" /></label>
+      <button class="btn" type="submit">Register</button>
+      <p class="muted">Already have an account? <a href="/login">Login</a></p>
+      <div id="msg" class="msg"></div>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const json = await res.json();
+      if (json.success) location.href = '/'; else document.getElementById('msg').textContent = json.error || 'Registration failed';
+    });
+  </script>
+  </body>
+  </html>
+
