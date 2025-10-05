@@ -4,20 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mindfulness — Bloom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
 <body>
   <header class="site-header">
-    <div class="container nav">
+    <div class="nav">
       <a class="brand" href="/">Bloom</a>
       <nav>
         <a class="btn btn-outline" href="/exercise">Exercise</a>
         <a class="btn btn-outline" href="/food">Food</a>
-        <a href="/account" class="btn user-btn" title="Account">Account</a>
+        <a href="/account" class="btn btn-outline">Account</a>
       </nav>
     </div>
   </header>
   <main class="container">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <img src="/static/img/mindfulness.png" alt="Mindfulness" style="width: 200px; height: auto; margin-bottom: 16px;" />
+    </div>
     <h1>Mindfulness Journal</h1>
     <form id="journalForm" class="card grid">
       <label>Date<input type="date" name="date" required /></label>
