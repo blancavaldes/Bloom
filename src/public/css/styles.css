@@ -62,6 +62,9 @@ input, textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 
 .list .item .actions { display: flex; gap: 8px; }
 .list .item .actions button { border-radius: 10px; padding: 6px 10px; border: 1px solid var(--border); background: var(--pink-100); color: var(--text); cursor: pointer; }
 .list .item .actions button.delete { background: white; color: #b42318; }
+.list .item .actions button.save { background: var(--pink); color: white; }
+.list .item .actions button.cancel { background: white; color: var(--muted); }
+.list .item.editing { background: var(--pink-100); border-color: var(--pink); }
 
 .muted { color: var(--muted); }
 .msg { color: #b42318; margin-top: 8px; }

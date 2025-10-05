@@ -20,9 +20,11 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { date, title, content } = req.body;
+  // Convert ISO date to YYYY-MM-DD format
+  const dateOnly = new Date(date).toISOString().split('T')[0];
   const result = await query(
     'INSERT INTO journal_entries (user_id, date, title, content) VALUES (?, ?, ?, ?)',
-    [req.session.userId, date, title, content]
+    [req.session.userId, dateOnly, title, content]
   );
   res.json({ id: result.insertId });
 });
@@ -30,9 +32,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { date, title, content } = req.body;
+  // Convert ISO date to YYYY-MM-DD format
+  const dateOnly = new Date(date).toISOString().split('T')[0];
   await query(
     'UPDATE journal_entries SET date = ?, title = ?, content = ? WHERE id = ? AND user_id = ? LIMIT 1',
-    [date, title, content, id, req.session.userId]
+    [dateOnly, title, content, id, req.session.userId]
   );
   res.json({ success: true });
 });
