@@ -21,6 +21,15 @@ export function getPool() {
   return pool;
 }
 
+// Test helper: allow tests to inject or reset the pool
+export function __setPool(p) {
+  pool = p;
+}
+
+export function __resetPool() {
+  pool = undefined;
+}
+
 export async function query(sql, params) {
   const [rows] = await getPool().execute(sql, params);
   return rows;

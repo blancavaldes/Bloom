@@ -162,3 +162,50 @@ The application uses the following main tables:
 - **meals**: Food logging data (date, name, calories, notes)
 - **journal_entries**: Mindfulness journal (date, title, content, mood)
 
+## Deployment to Azure (CI/CD)
+
+This project includes a GitHub Actions workflow that can build and deploy the app to an **Azure Web App**. The workflow file is `.github/workflows/azure-deploy.yml` and runs on pushes to `main`.
+
+High-level steps to deploy from GitHub to Azure:
+
+- Create the Azure resources (resource group, App Service plan, Web App, and a MySQL server).
+- Configure database and import `sql/schema.sql` into the MySQL server.
+- Add necessary repository secrets (see below).
+- Push changes to `main` and the workflow will run and deploy the site.
+
+Important GitHub secrets to set (Repository -> Settings -> Secrets):
+
+- `AZURE_CREDENTIALS` — the service principal JSON your professor gave you. This is used by the `azure/login` action.
+- `AZURE_WEBAPP_NAME` — the name of the App Service Web App you created.
+- `AZURE_RESOURCE_GROUP` — resource group that contains the Web App.
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` — database connection values for production.
+- `SESSION_SECRET` — a strong secret for sessions in production.
+
+Quick Azure CLI example (you can run these locally after logging in with `az login`):
+
+```bash
+# create a resource group
+az group create --name bloom-rg --location eastus
+
+# create an App Service plan (Linux)
+az appservice plan create --name bloom-plan --resource-group bloom-rg --is-linux --sku B1
+
+# create the Web App (replace <app-name> with a globally unique name)
+az webapp create --resource-group bloom-rg --plan bloom-plan --name <app-name> --runtime "NODE|18-lts"
+
+# (Recommended) Create an Azure Database for MySQL server and configure networking. See Azure docs for exact commands.
+```
+
+After creating the Web App and database, add the production DB values and `SESSION_SECRET` to the Web App configuration or set them as GitHub secrets and enable the optional configuration step in the workflow.
+
+Notes:
+- The workflow currently deploys the full repository root to the Web App. The `start` script in `package.json` uses `src/server.js`, so App Service will start the Node process correctly.
+- The workflow includes a step to set App Settings via the CLI when `AZURE_WEBAPP_NAME` and `AZURE_RESOURCE_GROUP` are present as secrets. This will configure the Web App to have the same environment variables used locally.
+
+If you'd like, I can:
+
+- Create a Dockerfile and modify the workflow to deploy a container to Azure App Service for Containers, or
+- Create a small script that runs the DB migration automatically during deployment, or
+- Draft the 5–6 page report (SDLC, architecture diagram, reflection) and produce a UML/architecture diagram image.
+
+
