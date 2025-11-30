@@ -1,0 +1,62 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Minimal dashboard for Bloom: request count, latency, and error rate (Prometheus)",
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Request Rate (req/s)",
+      "datasource": "-- Prometheus --",
+      "id": 1,
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m]))",
+          "legendFormat": "req/s"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 0, "w": 8, "h": 4}
+    },
+    {
+      "type": "graph",
+      "title": "Request Latency (p95)",
+      "datasource": "-- Prometheus --",
+      "id": 2,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {"x": 8, "y": 0, "w": 8, "h": 6}
+    },
+    {
+      "type": "stat",
+      "title": "Error Rate (5m)",
+      "datasource": "-- Prometheus --",
+      "id": 3,
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+          "legendFormat": "errors"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 4, "w": 8, "h": 4}
+    }
+  ],
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["bloom","monitoring"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Bloom - Minimal Metrics",
+  "uid": null,
+  "version": 1
+}
