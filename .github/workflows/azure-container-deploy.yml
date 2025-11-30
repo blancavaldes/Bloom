@@ -1,0 +1,62 @@
+name: Build and deploy Docker image to Azure Web App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+        run: |
+          echo "Logging into ACR: $ACR_NAME"
+          az acr login --name $ACR_NAME
+
+      - name: Build and push image to ACR
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          FULL_IMAGE=${ACR_NAME}.azurecr.io/bloom:${IMAGE_TAG}
+          docker build -t ${FULL_IMAGE} .
+          docker push ${FULL_IMAGE}
+          echo "IMAGE=${FULL_IMAGE}" >> $GITHUB_ENV
+
+      - name: Configure Web App container image
+        env:
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+        run: |
+          echo "Setting container image for webapp: $WEBAPP_NAME"
+          az webapp config container set --resource-group "$RESOURCE_GROUP" --name "$WEBAPP_NAME" --docker-custom-image-name "${{ env.IMAGE }}"
+
+      - name: Configure App Settings (DB and session)
+        env:
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+        run: |
+          az webapp config appsettings set --resource-group "$RESOURCE_GROUP" --name "$WEBAPP_NAME" --settings \
+            DB_HOST="${{ secrets.DB_HOST }}" \
+            DB_PORT="${{ secrets.DB_PORT }}" \
+            DB_USER="${{ secrets.DB_USER }}" \
+            DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            DB_DATABASE="${{ secrets.DB_DATABASE }}" \
+            SESSION_SECRET="${{ secrets.SESSION_SECRET }}"
